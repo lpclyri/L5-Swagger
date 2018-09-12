@@ -3,8 +3,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/DarkaOnLine/L5-Swagger/badge.svg?branch=master)](https://coveralls.io/github/DarkaOnLine/L5-Swagger?branch=master)
 [![Code Climate](https://codeclimate.com/github/DarkaOnLine/L5-Swagger/badges/gpa.svg)](https://codeclimate.com/github/DarkaOnLine/L5-Swagger)
 [![StyleCI](https://styleci.io/repos/32315619/shield)](https://styleci.io/repos/32315619)
+[![Dependency Status](https://beta.gemnasium.com/badges/github.com/DarkaOnLine/L5-Swagger.svg)](https://beta.gemnasium.com/projects/github.com/DarkaOnLine/L5-Swagger)
 
-L5 Swagger
+L5 Swagger - OpenApi or Swagger Specification for your Laravel project made easy.
 ==========
 
 Swagger 2.0 for Laravel >=5.1
@@ -14,22 +15,24 @@ This package is a wrapper of [Swagger-php](https://github.com/zircote/swagger-ph
 Installation
 ============
 
-For Swagger 2.0
+ Laravel          | Swagger UI| OpenAPI Spec compatibility | L5-Swagger
+:-----------------|:----------|:---------------------------|:----------
+ 5.7.x OR 5.6.x   | 3         | 3.0, 2.0                   | `composer require "darkaonline/l5-swagger:5.7.*"` <span style="color: red"> !!! run ` composer require 'zircote/swagger-php:2.*'` if you need old **@SWG (SWAGGER annotations)** support. !!!</span>
+ 5.6.x            | 3         | 2.0                        | `composer require "darkaonline/l5-swagger:5.6.*"`
+ 5.5.x            | 3         | 2.0                        | `composer require "darkaonline/l5-swagger:5.5.*"`
+ 5.4.x            | 3         | 2.0                        | `composer require "darkaonline/l5-swagger:5.4.*"`
+ 5.4.x            | 2.2       | 1.1, 1.2, 2.0              | `composer require "darkaonline/l5-swagger:~4.0"`
+ 5.3.x            | 2.2       | 1.1, 1.2, 2.0              | `composer require "darkaonline/l5-swagger:~3.0"`
+ 5.2.x            | 2.2       | 1.1, 1.2, 2.0              | `composer require "darkaonline/l5-swagger:~3.0"`
+ 5.1.x            | 2.2       | 1.1, 1.2, 2.0              | `composer require "darkaonline/l5-swagger:~3.0"`
 
- Laravel  | Swagger UI| OpenAPI Spec compatibility | L5-Swagger
-:---------|:----------|:---------------------------|:----------
- 5.1.x    | 2.2       | 1.1, 1.2, 2.0              | ```php composer require "darkaonline/l5-swagger:~3.0" ```
- 5.2.x    | 2.2       | 1.1, 1.2, 2.0              | ```php composer require "darkaonline/l5-swagger:~3.0" ```
- 5.3.x    | 2.2       | 1.1, 1.2, 2.0              | ```php composer require "darkaonline/l5-swagger:~3.0" ```
- 5.4.x    | 2.2       | 1.1, 1.2, 2.0              | ```php composer require "darkaonline/l5-swagger:~4.0" ```
- 5.4.x    | 3         | 2.0                        | ```php composer require "darkaonline/l5-swagger:5.4.*" ```
- 5.5.x    | 3         | 2.0                        | ```php composer require "darkaonline/l5-swagger:5.5.*" ```
+You can publish L5-Swagger's config and view files into your project by running:
 
-
-For Swagger 1.0
-```php
-composer require darkaonline/l5-swagger
+```bash
+$ php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
 ```
+
+For Laravel >=5.5, no need to manually add `L5SwaggerServiceProvider` into config. It uses package auto discovery feature. Skip this if you are on >=5.5, if not:
 
 Open your `AppServiceProvider` (located in `app/Providers`) and add this line in `register` function
 ```php
@@ -40,7 +43,26 @@ or open your `config/app.php` and add this line in `providers` section
 L5Swagger\L5SwaggerServiceProvider::class,
 ```
 
-For Laravel 5.5, no need to manually add `L5SwaggerServiceProvider` into config. It uses package auto discovery feature.
+## Swagger/OpenApi annotations and generating documentation
+In order to generate the Swagger/OpenApi documentation for your API, Swagger offers a set of annotations to declare and manipulate the output. These annotations can be added in your controller, model or even a seperate file. An example of [OpenApi annotations can be found here](https://github.com/DarkaOnLine/L5-Swagger/blob/master/tests/storage/annotations/OpenApi/Anotations.php) and [Swagger annotations can be found here](https://github.com/DarkaOnLine/L5-Swagger/blob/master/tests/storage/annotations/Swagger/Anotations.php). For more info check out Swagger's ["pet store" example](https://github.com/zircote/swagger-php/tree/3.x/Examples/petstore-3.0) or the [Swagger OpenApi Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
+
+After the annotiations have been added you can run `php artisan l5-swagger:generate` to generate the documentation. Alternatively, you can set `L5_SWAGGER_GENERATE_ALWAYS` to `true` in your `.env` file so that your documentation will automatically be generated. Make sure your settings in `config/l5-swagger.php` are complete.
+
+I am still using Swagger @SWG annotation
+============
+If still using Swagger @SWG annotations in you project you should:
+- Explicitly require `swagger-php` version 2.* in your projects composer by running:
+```bash
+composer require 'zircote/swagger-php:2.*'
+```
+- Set environment variable `SWAGGER_VERSION` to **2.0** in your `.env` file:
+```
+SWAGGER_VERSION=2.0
+```
+or in your `config/l5-swagger.php`:
+```php
+'swagger_version' => env('SWAGGER_VERSION', '2.0'),
+```
 
 Using Swagger UI with Passport
 ============
@@ -49,8 +71,7 @@ The easiest way to build and test your Laravel-based API using Swagger-php is to
 To get started, first publish L5-Swagger's config and view files into your own project:
 
 ```bash
-$ php artisan l5-swagger:publish-config
-$ php artisan l5-swagger:publish-views
+$ php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
 ```
 
 Next, edit your `config/l5-swagger.php` configuration file. Locate the `l5-swagger.routes.middleware` section, and add the following middleware list to the `api` route:
@@ -131,10 +152,12 @@ Migrate from 3.0|4.0 to 5.0
 
 Configuration
 ============
+### For versions < 5.5
 - Run `l5-swagger:publish` to publish everything
 - Run `l5-swagger:publish-config` to publish configs (`config/l5-swagger.php`)
 - Run `l5-swagger:publish-assets` to publish swagger-ui to your public folder (`public/vendor/l5-swagger`)
 - Run `l5-swagger:publish-views` to publish views (`resources/views/vendor/l5-swagger`) - only for versions <= 4.0
+### For all versions
 - Run `l5-swagger:generate` to generate docs or set `generate_always` param to `true` in your config or .env file
 
 Swagger-php

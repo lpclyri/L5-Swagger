@@ -7,13 +7,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
 {
-    protected function getPackageProviders($app)
-    {
-        return [
-            L5SwaggerServiceProvider::class,
-        ];
-    }
-
     public function setUp()
     {
         parent::setUp();
@@ -25,9 +18,29 @@ class TestCase extends OrchestraTestCase
     {
         if (file_exists($this->jsonDocsFile())) {
             unlink($this->jsonDocsFile());
+        }
+
+        if (file_exists($this->yamlDocsFile())) {
+            unlink($this->yamlDocsFile());
+        }
+
+        if (file_exists(config('l5-swagger.paths.docs'))) {
             rmdir(config('l5-swagger.paths.docs'));
         }
+
         parent::tearDown();
+    }
+
+    protected function isOpenApi()
+    {
+        return version_compare(config('l5-swagger.swagger_version'), '3.0', '>=');
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            L5SwaggerServiceProvider::class,
+        ];
     }
 
     protected function crateJsonDocumentationFile()
@@ -44,11 +57,26 @@ class TestCase extends OrchestraTestCase
         return config('l5-swagger.paths.docs').'/'.config('l5-swagger.paths.docs_json');
     }
 
+    protected function yamlDocsFile()
+    {
+        if (! is_dir(config('l5-swagger.paths.docs'))) {
+            mkdir(config('l5-swagger.paths.docs'));
+        }
+
+        return config('l5-swagger.paths.docs').'/'.config('l5-swagger.paths.docs_yaml');
+    }
+
     protected function setAnnotationsPath()
     {
         $cfg = config('l5-swagger');
-        $cfg['paths']['annotations'] = __DIR__.'/storage/annotations';
+        $cfg['paths']['annotations'] = __DIR__.'/storage/annotations/Swagger';
+
+        if ($this->isOpenApi()) {
+            $cfg['paths']['annotations'] = __DIR__.'/storage/annotations/OpenApi';
+        }
+
         $cfg['generate_always'] = true;
+        $cfg['generate_yaml_copy'] = true;
 
         //Adding constants which will be replaced in generated json file
         $cfg['constants']['L5_SWAGGER_CONST_HOST'] = 'http://my-default-host.com';

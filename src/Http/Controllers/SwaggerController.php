@@ -44,19 +44,21 @@ class SwaggerController extends BaseController
             Generator::generateDocs();
         }
 
-        if (config('l5-swagger.proxy')) {
-            $proxy = Request::server('REMOTE_ADDR');
-            Request::setTrustedProxies([$proxy]);
+        if ($proxy = config('l5-swagger.proxy')) {
+            if (! is_array($proxy)) {
+                $proxy = [$proxy];
+            }
+            Request::setTrustedProxies($proxy, \Illuminate\Http\Request::HEADER_X_FORWARDED_ALL);
         }
 
         // Need the / at the end to avoid CORS errors on Homestead systems.
         $response = Response::make(
             view('l5-swagger::index', [
-                'secure'             => Request::secure(),
-                'urlToDocs'          => route('l5-swagger.docs', config('l5-swagger.paths.docs_json', 'api-docs.json')),
-                'operationsSorter'   => config('l5-swagger.operations_sort'),
-                'configUrl'          => config('l5-swagger.additional_config_url'),
-                'validatorUrl'       => config('l5-swagger.validator_url'),
+                'secure' => Request::secure(),
+                'urlToDocs' => route('l5-swagger.docs', config('l5-swagger.paths.docs_json', 'api-docs.json')),
+                'operationsSorter' => config('l5-swagger.operations_sort'),
+                'configUrl' => config('l5-swagger.additional_config_url'),
+                'validatorUrl' => config('l5-swagger.validator_url'),
             ]),
             200
         );

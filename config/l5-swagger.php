@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     'api' => [
         /*
         |--------------------------------------------------------------------------
@@ -13,7 +12,6 @@ return [
     ],
 
     'routes' => [
-
         /*
         |--------------------------------------------------------------------------
         | Route for accessing api documentation interface
@@ -49,11 +47,9 @@ return [
             'docs' => [],
             'oauth2_callback' => [],
         ],
-
     ],
 
     'paths' => [
-
         /*
         |--------------------------------------------------------------------------
         | Absolute path to location where parsed swagger annotations will be stored
@@ -69,6 +65,14 @@ return [
         */
 
         'docs_json' => 'api-docs.json',
+
+        /*
+        |--------------------------------------------------------------------------
+        | File name of the generated YAML documentation file
+        |--------------------------------------------------------------------------
+         */
+
+        'docs_yaml' => 'api-docs.yaml',
 
         /*
         |--------------------------------------------------------------------------
@@ -131,7 +135,25 @@ return [
                 'read:projects' => 'read your projects',
                 'write:projects' => 'modify projects in your account',
             ]
-        ],*/
+        ],
+        */
+
+        /* Open API 3.0 support
+        'passport' => [ // Unique name of security
+            'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
+            'description' => 'Laravel passport oauth2 security.',
+            'in' => 'header',
+            'scheme' => 'https',
+            'flows' => [
+                "password" => [
+                    "authorizationUrl" => config('app.url') . '/oauth/authorize',
+                    "tokenUrl" => config('app.url') . '/oauth/token',
+                    "refreshUrl" => config('app.url') . '/token/refresh',
+                    "scopes" => []
+                ],
+            ],
+        ],
+        */
     ],
 
     /*
@@ -144,11 +166,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Turn this on to generate a copy of documentation in yaml format
+    |--------------------------------------------------------------------------
+     */
+
+    'generate_yaml_copy' => env('L5_SWAGGER_GENERATE_YAML_COPY', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Edit to set the swagger version number
     |--------------------------------------------------------------------------
     */
 
-    'swagger_version' => env('SWAGGER_VERSION', '2.0'),
+    'swagger_version' => env('SWAGGER_VERSION', '3.0'),
 
     /*
     |--------------------------------------------------------------------------
